@@ -444,7 +444,7 @@ class BuildingResult:
     # Vignette RGB (PNG, en memoire) -- cf. suivi projet, galerie visuelle en
     # mode zone. Meme rationale que pipeline.AddressResult.thumbnail_png :
     # les tuiles orthophoto sont supprimees (TemporaryDirectory) avant que
-    # app.py ne puisse les afficher, donc on garde la vignette en memoire,
+    # le frontend ne puisse les afficher, donc on garde la vignette en memoire,
     # generee gratuitement a partir du patch deja extrait pour l'inference.
     thumbnail_png: Optional[bytes] = None
     # Crop plus large (16m de cote par defaut), distinct du patch modele
@@ -551,7 +551,7 @@ def flag_heat_island_suspects(
 
     Returns:
         Le seuil d'albedo effectivement utilise (utile pour l'affichage
-        cote app.py -- l'utilisateur doit savoir quel seuil a ete applique).
+        cote frontend -- l'utilisateur doit savoir quel seuil a ete applique).
 
     Complexite O(n^2) sur les batiments sombres uniquement (pas tous les
     batiments de la zone) -- largement suffisant vu les volumes en jeu
@@ -614,7 +614,7 @@ def flag_cool_island_suspects(
     flag_heat_island_suspects pour le detail du raisonnement.
 
     Returns:
-        Le seuil de clarte effectivement utilise (pour affichage cote app.py).
+        Le seuil de clarte effectivement utilise (pour affichage cote frontend).
     """
     if bright_threshold is None:
         bright_threshold = get_bright_threshold(city_key)
@@ -704,7 +704,8 @@ def scan_zone(
     city_key_override: Optional[str] = None,
     progress_callback=None,
 ) -> ZoneScanResult:
-    """Point d'entree principal pour app.py (3e onglet "Scan de zone").
+    """Point d'entree principal pour l'endpoint /api/zone de main.py
+    (section "Scan de zone" du frontend).
 
     Args:
         center_address: adresse texte libre servant de centre de la zone.

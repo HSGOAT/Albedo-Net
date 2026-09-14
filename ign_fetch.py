@@ -331,13 +331,14 @@ def list_building_candidates(
     """Liste les batiments candidats proches, tries par score (proximite + surface).
 
     Utilise pour :
-      - Point 1 (choix visuel) : app.py affiche ces candidats en vignettes.
+      - Point 1 (choix visuel) : le frontend affiche ces candidats en vignettes
+        (donnees exposees par main.py).
       - Point 2 (site dense -> forcer selection manuelle) : voir
         is_dense_site() ci-dessous, base sur len(candidats).
       - Point 4 (ponderation surface) : le tri par score privilegie deja
         les grands batiments a distance comparable ; is_default_pick=True
         marque le meilleur candidat (utilisable en auto si pas de site dense).
-      - Point 5 (correction a posteriori) : app.py peut rouvrir cette liste
+      - Point 5 (correction a posteriori) : le frontend peut rouvrir cette liste
         apres coup pour permettre a l'utilisateur de changer son choix.
     """
     if len(gdf_buildings) == 0:
@@ -379,7 +380,7 @@ def is_dense_site(candidates: list[BuildingCandidate]) -> bool:
 
     Sur un site dense (ecole/gymnase/complexe industriel avec plusieurs
     batiments sur la meme parcelle), le matching automatique par distance
-    seule est peu fiable -- l'app.py DEVRAIT alors privilegier la selection
+    seule est peu fiable -- le frontend DEVRAIT alors privilegier la selection
     manuelle visuelle plutot que le pick automatique.
     """
     return len(candidates) >= DENSE_SITE_CANDIDATE_THRESHOLD
@@ -565,7 +566,7 @@ def crop_thumbnail(
 
 
 # ---------------------------------------------------------------------------
-# Orchestration -- point d'entree unique utilise par app.py
+# Orchestration -- point d'entree unique utilise par main.py
 # ---------------------------------------------------------------------------
 
 @dataclass
@@ -576,7 +577,7 @@ class AddressFetchResult:
     # --- Ajouts correctifs multi-batiments (cf. suivi projet 2026-07-11) ---
     candidates: list = None            # list[BuildingCandidate], vide si aucun proche
     area_ortho_path: Optional[Path] = None  # tuile large partagee pour les vignettes
-    is_dense_site: bool = False        # cf. is_dense_site() -- signal pour app.py
+    is_dense_site: bool = False        # cf. is_dense_site() -- signal pour le frontend
 
     def __post_init__(self):
         if self.candidates is None:
@@ -591,14 +592,14 @@ def fetch_building_and_ortho(
     with_candidates: bool = True,
     session: Optional[requests.Session] = None,
 ) -> AddressFetchResult:
-    """Point d'entree principal pour app.py : adresse geocodee -> batiment + orthophoto.
+    """Point d'entree principal pour main.py : adresse geocodee -> batiment + orthophoto.
 
     Retourne un AddressFetchResult. Si match.confidence == "none", ortho_path
     est quand meme rempli si possible (centre sur le point geocode brut) pour
-    permettre a l'app d'afficher une image de la zone malgre l'absence de
+    permettre au frontend d'afficher une image de la zone malgre l'absence de
     correspondance batiment fiable -- l'utilisateur peut alors verifier
-    visuellement et, si necessaire, l'app doit clairement indiquer qu'aucune
-    inference automatique n'a ete faite.
+    visuellement et, si necessaire, le frontend doit clairement indiquer
+    qu'aucune inference automatique n'a ete faite.
 
     with_candidates=True (par defaut) : calcule aussi la liste de candidats
     (point 1) et telecharge UNE tuile large partagee pour les vignettes
@@ -610,7 +611,7 @@ def fetch_building_and_ortho(
     session : permet d'injecter une requests.Session deja construite (et donc
     son pool de connexions/keep-alive) au lieu d'en creer une nouvelle a
     chaque appel. Comportement par defaut (session=None) inchange pour
-    app.py : une session ephemere est creee ici, adaptee a un appel isole
+    main.py : une session ephemere est creee ici, adaptee a un appel isole
     par interaction utilisateur. Pour un traitement par lot (des centaines/
     milliers d'appels, cf. build_training_dataset.py), passer une session
     partagee (idealement une par thread) evite de renegocier TLS a chaque
@@ -655,7 +656,7 @@ def fetch_building_and_ortho(
         if dense:
             logger.info(
                 "Site dense detecte (%d candidats proches) : selection manuelle "
-                "recommandee cote app.py.", len(candidates),
+                "recommandee cote frontend.", len(candidates),
             )
 
     if match.confidence == "none":

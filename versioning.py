@@ -107,7 +107,7 @@ def build_run_metadata(checkpoint_path: str, city_key_used: str, mode: str) -> R
 
 def format_run_metadata_footer(meta: RunMetadata) -> str:
     """Ligne de synthese lisible, a afficher/exporter en pied de page ou de
-    rapport (cf. app.py, generate_report.py)."""
+    rapport (cf. main.py, generate_report.py)."""
     chash = meta.checkpoint_hash or "hash indisponible"
     return (
         f"Run {meta.run_timestamp_utc} | mode={meta.mode} | "

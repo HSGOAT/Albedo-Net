@@ -14,7 +14,8 @@ Strategie de matching, du plus precis au moins precis :
   3. Si l'API BAN ne renvoie rien du tout (adresse introuvable) : on ne peut
      pas deduire de departement -> on demande explicitement a l'utilisateur
      de choisir sa region dans une liste (config.REGIONS_FR), geree cote
-     app.py (ce module expose juste resolve_city_key_from_region()).
+     frontend (static/index.html, via l'API exposee par main.py -- ce
+     module expose juste resolve_city_key_from_region()).
   4. Si la region choisie n'a aucun modele associe : fallback generique
      (config.GENERIC_FALLBACK_MODEL).
 
@@ -220,7 +221,7 @@ class CityResolution:
     city_key: str | None                 # match direct et fiable, sinon None
     region: str | None                   # region deduite (si dispo)
     region_candidates: list[str]         # villes couvertes dans cette region
-    needs_user_region: bool              # True -> app.py doit demander la region
+    needs_user_region: bool              # True -> le frontend doit demander la region
 
 
 def reverse_geocode(lat: float, lon: float, timeout: float = 5.0) -> str | None:
@@ -259,10 +260,10 @@ def resolve_city_key(result: GeocodeResult) -> CityResolution:
     - Si match direct fiable (nom de commune + score suffisant) -> city_key rempli.
     - Sinon, si on peut deduire une region (via citycode) avec au moins une
       ville couverte -> region + region_candidates remplis, city_key=None
-      (app.py doit alors demander a l'utilisateur de confirmer/affiner,
+      (le frontend doit alors demander a l'utilisateur de confirmer/affiner,
       ou choisir directement si un seul candidat).
     - Sinon (rien d'exploitable, ou region non couverte) -> needs_user_region=True,
-      app.py doit proposer la liste complete config.REGIONS_FR.
+      le frontend doit proposer la liste complete config.REGIONS_FR.
     """
     if not result.found:
         return CityResolution(
@@ -308,8 +309,9 @@ def resolve_city_key(result: GeocodeResult) -> CityResolution:
 
 def resolve_city_key_from_region(region: str) -> list[str]:
     """
-    A utiliser cote app.py une fois que l'utilisateur a choisi manuellement
-    sa region dans la liste config.REGIONS_FR. Retourne la liste des cles
-    ville couvertes (0, 1 ou plusieurs -- app.py affiche un 2e select si >1).
+    A utiliser cote frontend (via l'API main.py) une fois que l'utilisateur
+    a choisi manuellement sa region dans la liste config.REGIONS_FR.
+    Retourne la liste des cles ville couvertes (0, 1 ou plusieurs -- le
+    frontend affiche un 2e select si >1).
     """
     return REGION_TO_CITY_KEYS.get(region, [])

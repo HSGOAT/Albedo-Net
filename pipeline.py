@@ -2,9 +2,9 @@
 pipeline.py — AlbedoNet App
 =============================
 Pipeline unique adresse -> albedo, factorise pour etre appele a l'identique
-depuis le mode "adresse unique" et le mode "lot d'adresses" de app.py.
+depuis le mode "adresse unique" et le mode "lot d'adresses" de main.py.
 
-En mode lot, il n'y a personne pour repondre a un selectbox "quelle ville
+En mode lot, il n'y a personne pour repondre a un menu "quelle ville
 choisir parmi ces 3 candidats region ?" -- resolve_batch() applique donc une
 regle de decision automatique explicite (premier candidat de la liste,
 qui est la ville "grande metropole" de la region par convention de
@@ -168,7 +168,7 @@ class AddressResult:
     # Vignette RGB (PNG, en memoire) du patch decoupe -- cf. suivi projet,
     # points 1/5 (verification visuelle en lot). Stockee en bytes plutot
     # qu'un chemin car ortho_path pointe dans un TemporaryDirectory qui est
-    # supprime avant que app.py ne puisse l'afficher en fin de traitement
+    # supprime avant que main.py ne puisse l'afficher en fin de traitement
     # par lot -- la vignette, elle, survit (quelques Ko en memoire).
     thumbnail_png:    Optional[bytes] = None
     error:            Optional[str] = None   # message d'erreur lisible, si echec a une etape

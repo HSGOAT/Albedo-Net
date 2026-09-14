@@ -53,7 +53,7 @@ import pandas as pd
 # Plages bibliographiques "vieilli/expose" issues de albedo_reference_table.md
 # -- NE PAS elargir/retrecir sans mettre a jour ce fichier .md en parallele
 # (source de verite documentaire).
-# Alpha par defaut utilise par zone_scan.py/pipeline.py/app.py -- 0.0 =
+# Alpha par defaut utilise par zone_scan.py/pipeline.py/main.py -- 0.0 =
 # fonctionnalite INERTE (albedo_ajuste_biblio == albedo). A ne monter que si
 # une vraie validation (OSM ou annotation manuelle) confirme un biais reel
 # et pas seulement une plage bibliographique trop etroite (cf. discussion

@@ -90,8 +90,8 @@ COMMUNE_TO_CITY_KEY: dict[str, str] = {
 #
 # Quand une region a plusieurs villes couvertes, la premiere de la liste est
 # la ville "grande metropole" proposee par defaut ; les suivantes sont
-# proposees comme options plus precises dans le selectbox de secours
-# (cf. geocoding.py / app.py).
+# proposees comme options plus precises dans le menu de secours cote
+# frontend (cf. geocoding.py / main.py).
 #
 # "beauce" retire des listes ci-dessous (Centre-Val de Loire, Ile-de-France)
 # suite au diagnostic du 09/07/2026 -- ces regions retombent donc sur un
@@ -114,8 +114,8 @@ REGION_TO_CITY_KEYS: dict[str, list[str]] = {
     "Provence-Alpes-Cote d'Azur":  ["marseille", "nice", "provence_rurale"],
 }
 
-# Liste ordonnee des regions a proposer dans le selectbox Streamlit de
-# secours (region administrative francaise standard, metropole uniquement).
+# Liste ordonnee des regions a proposer dans le menu de secours cote
+# frontend (region administrative francaise standard, metropole uniquement).
 REGIONS_FR: list[str] = list(REGION_TO_CITY_KEYS.keys())
 
 

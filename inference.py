@@ -269,7 +269,9 @@ class AlbedoPredictor:
 
 
 # Cache simple pour eviter de recharger le meme checkpoint a chaque appel
-# (utile depuis app.py qui appelle predict() a chaque interaction Streamlit).
+# (utile car main.py appelle predict() a chaque requete /api/single ou
+# /api/batch, potentiellement plusieurs requetes concurrentes sur le meme
+# process FastAPI/uvicorn).
 # threading.Lock ajoute pour le traitement parallelise (lot d'adresses / scan
 # de zone, cf. pipeline.py et zone_scan.py) -- sans lock, deux threads
 # demarrant en meme temps sur un checkpoint pas encore en cache pourraient
@@ -293,7 +295,7 @@ def get_predictor(checkpoint_path: str, device: str = "cpu") -> AlbedoPredictor:
 
 
 def predict_albedo(patch: np.ndarray, checkpoint_path: str, device: str = "cpu") -> float:
-    """Point d'entree simple a appeler depuis app.py."""
+    """Point d'entree simple a appeler depuis main.py."""
     predictor = get_predictor(checkpoint_path, device=device)
     return predictor.predict(patch)
 

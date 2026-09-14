@@ -161,7 +161,7 @@ def extract_and_normalize_patch(
     patch_size: int = PATCH_SIZE,
     resolution: float = 0.20,
 ) -> Optional[np.ndarray]:
-    """Point d'entree unique pour app.py : decoupe + normalisation min-max."""
+    """Point d'entree unique pour main.py : decoupe + normalisation min-max."""
     raw_patch = extract_patch(ortho_path, centroid_x, centroid_y, patch_size, resolution)
     if raw_patch is None:
         return None
