@@ -121,6 +121,7 @@ def api_single(address: str):
             return {
                 "found": True, "address_label": geocode_result.address_label,
                 "lat": geocode_result.lat, "lon": geocode_result.lon,
+                "albedo": None,
                 "error": f"Echec de la recuperation IGN (WFS/WMS) : {exc}",
             }
 
