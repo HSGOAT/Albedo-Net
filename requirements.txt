@@ -1,0 +1,58 @@
+# requirements.txt — AlbedoNet
+# =============================
+# Premiere version versionnee des dependances (aucun requirements.txt
+# n'existait avant -- la CI avait sa propre liste codee en dur dans
+# .github/workflows/data-and-thresholds-audit.yml, qui pouvait diverger
+# silencieusement d'un environnement de dev local). Ce fichier est la
+# source unique de verite des VERSIONS desormais.
+#
+# La CI n'installe pas ce fichier tel quel : elle utilise
+# requirements-ci.txt, un sous-ensemble strict qui evite les dependances
+# geo lourdes (geopandas/rasterio, GDAL) non necessaires pour lancer
+# tests/. Si vous ajoutez/bumpez une dependance ici et qu'elle est aussi
+# dans requirements-ci.txt, repercutez la version dans les deux fichiers.
+#
+# Versions minimales fixees a partir de ce qui tourne aujourd'hui, sans
+# borne haute stricte pour ne pas se braquer sur un patch precis avant
+# d'avoir un vrai processus de mise a jour -- a resserrer (==) une fois
+# qu'un environnement de reference est fige (cf. README.md, section
+# "Prochaines etapes").
+#
+# NE PAS ajouter ici les dependances du frontend Streamlit archive
+# (streamlit, pydeck) : elles vivent dans requirements-legacy.txt,
+# volontairement separees pour ne pas alourdir l'install du produit
+# officiel (cf. METHODOLOGIE.md section 2).
+
+# --- Backend API (main.py) ---
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.0
+
+# --- Reseau / geocodage / IGN ---
+requests>=2.31
+urllib3>=2.0
+
+# --- Calcul scientifique / donnees ---
+numpy>=1.26
+pandas>=2.2
+pyarrow>=15.0          # lecture datasets/materials_v1.parquet
+scipy>=1.12
+
+# --- Geo (matching batiment, projections, zone_scan) ---
+geopandas>=0.14
+shapely>=2.0
+pyproj>=3.6
+rasterio>=1.3
+
+# --- Vision / patch / calibration ombre ---
+opencv-python-headless>=4.9   # variante headless : pas de serveur X sur le backend
+Pillow>=10.2
+scikit-image>=0.22            # features GLCM (training/features.py, utilise aussi au runtime par materials.py)
+
+# --- Modeles ---
+torch>=2.2             # CPU suffisant, AlbedoPredictor tourne explicitement en device="cpu"
+scikit-learn>=1.4       # classifieur materiau (HistGradientBoostingClassifier)
+joblib>=1.3
+
+# --- Tests ---
+pytest>=8.0

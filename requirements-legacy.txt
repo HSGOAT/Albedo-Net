@@ -1,0 +1,22 @@
+# requirements-legacy.txt — AlbedoNet
+# ======================================
+# Dependances NON necessaires pour faire tourner le produit officiel
+# (main.py + static/index.html, cf. METHODOLOGIE.md section 2). A
+# installer en plus de requirements.txt uniquement si besoin ponctuel de :
+#
+#   - relancer l'app Streamlit archivee (legacy/app.py) ou l'outil
+#     interne d'annotation manuelle (data_collection/annotation_tool.py) ;
+#   - regenerer le dataset materiaux depuis OSM
+#     (data_collection/osm_material_scraper.py) ;
+#   - retracer/diagnostiquer l'entrainement (utils/mae_utils.py, non
+#     utilise par le serving -- cf. utils/band_normalizer.py qui precise
+#     explicitement de ne pas utiliser mae_utils.py depuis l'app).
+#
+# Installer avec : pip install -r requirements.txt -r requirements-legacy.txt
+
+streamlit>=1.32
+pydeck>=0.8.1b0
+
+pyrosm>=0.6.2       # data_collection/osm_material_scraper.py
+matplotlib>=3.8     # utils/mae_utils.py (diagnostics entrainement)
+h5py>=3.10          # utils/mae_utils.py (diagnostics entrainement)

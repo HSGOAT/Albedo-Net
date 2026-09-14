@@ -2,8 +2,9 @@
 
 Toute modification de la logique d'extraction DOIT s'accompagner d'un incrément
 de FEATURE_SET_VERSION. Le dataset et le modèle enregistrent cette version afin
-de détecter automatiquement toute incompatibilité (cf. train_material_classifier.py
-et evaluate_material_classifier.py).
+de détecter automatiquement toute incompatibilité (cf. train_material_classifier.py,
+qui calcule et enregistre les metriques d'evaluation directement -- il n'existe
+pas de script d'evaluation separe pour l'instant).
 
 v3.0 (23/07/2026) -- Diagnostic post-entrainement v2.0 : F1 beton=0.40 (val) /
 0.33 (test), nettement le plus faible des 4 classes, cf. rapport

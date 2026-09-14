@@ -220,3 +220,53 @@ ville.
    avant dans le dépôt versionné). À rouvrir dès qu'une décision de §8.1
    est prise, ou qu'un mécanisme de §5 est étendu à une nouvelle classe de
    constantes.
+
+## 9. Analyse complète du 14/09/2026 et suites (post-§8)
+
+Une analyse plus large du dépôt (au-delà des 6 points ci-dessus) a
+identifié plusieurs dettes supplémentaires. Statut :
+
+- ~~Pas de `README.md`/`requirements.txt`/`LICENSE`~~ — `README.md` et
+  `requirements.txt` (+ `requirements-ci.txt` pour la CI,
+  `requirements-legacy.txt` pour Streamlit/outils offline) créés le
+  14/09/2026. `LICENSE` toujours absent — décision produit à prendre
+  séparément (licence ouverte vs propriétaire), pas traité ici.
+- ~~CI avec dépendances codées en dur~~ — `data-and-thresholds-audit.yml`
+  utilise désormais `requirements-ci.txt` (sous-ensemble strict de
+  `requirements.txt`, sans `geopandas`/`rasterio` qui dépendent de GDAL et
+  ne sont pas nécessaires pour `tests/`).
+- ~~Doublons de code morts~~ — `masking.py` et `band_normalizer.py` à la
+  racine (copies identiques de `utils/masking.py` et
+  `utils/band_normalizer.py`, jamais importées) supprimés.
+  `training/evaluate_material_classifier.py` (fichier vide, 2 lignes
+  blanches) supprimé — `train_material_classifier.py` calcule et
+  enregistre déjà les métriques d'évaluation, ce script séparé n'a jamais
+  été implémenté et ne manque à personne.
+- **Pas encore traité** — vérification d'intégrité par hash pour les
+  checkpoints `.pt` (asymétrie avec `materials.py` qui vérifie déjà son
+  `.joblib` contre `training/model_registry.json` au chargement ;
+  `versioning.py::checkpoint_short_hash` n'est aujourd'hui qu'informatif,
+  jamais un garde-fou).
+- **Pas encore traité** — erreurs silencieusement avalées sans
+  `logger.exception` dans plusieurs blocs `except Exception` de
+  `main.py` (l'erreur atteint le client HTTP mais rien n'est loggé côté
+  serveur, sauf pour la classification matériau).
+- **Pas encore traité** — `zone_scan.py` (1122 lignes, le plus gros
+  fichier du dépôt) mélange scan géographique, détection d'îlots de
+  chaleur, agrégation et sérialisation JSON/CSV/SSE ; candidat à un
+  découpage en sous-modules.
+- **Pas encore traité** — `CORSMiddleware(allow_origins=["*"])` dans
+  `main.py`, à resserrer avant toute exposition hors environnement de
+  dev.
+- **Pas encore traité** — aucun test n'appelle directement les endpoints
+  de `main.py` ; les audits actuels couvrent données/modèles, pas la
+  couche API elle-même.
+- **Pas encore traité** — `validate_thresholds.py` est en réalité
+  débloqué techniquement (son propre docstring, périmé, affirmait le
+  contraire : `albedo_brut`/`shadow_fraction` sont bien exportés par
+  `main.py` depuis un moment) ; il manque seulement le jeu de données
+  stratifié (150-200 adresses / 12-15 villes) exigé par le brief
+  Sprint 4 pour pouvoir le lancer.
+- **Décision produit toujours en suspens** — statut des 12 villes de
+  `city_registry.EXTRA_SCRAPING_ONLY_CITY_KEYS` ("statut à confirmer",
+  23/07/2026), sans échéance fixée.
