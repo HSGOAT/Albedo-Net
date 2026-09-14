@@ -41,6 +41,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pandas scikit-learn scikit-image pyarrow pytest joblib numpy opencv-python-headless
+          # torch en version CPU-only (plus legere/rapide a installer en CI que
+          # la version complete avec support GPU, inutile ici car
+          # AlbedoPredictor tourne explicitement en device="cpu")
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
 
       - name: Lancer tous les audits (etancheite splits + coherence seuils/cles)
         run: pytest tests/ -v
