@@ -30,12 +30,32 @@ from pipeline import process_batch
 from shadow_calibration import calibrate_albedo
 from zone_scan import scan_zone, scan_zone_events, zone_scan_result_to_json
 
+import checkpoint_integrity
+
 app = FastAPI(title="AlbedoNet API")
+
+
+@app.on_event("startup")
+def _verify_checkpoint_integrity() -> None:
+    # Refus au demarrage si un checkpoint present ne correspond pas au hash
+    # attendu (corruption / mauvaise version). Un checkpoint absent est gere
+    # ailleurs (cf. test_city_model_smoke.py) -- ce n'est pas la meme erreur.
+    checkpoint_integrity.verify()
+
+# Origines autorisées : liste explicite en prod (via env var), fallback dev
+# permissif uniquement en local. Ne jamais repasser à ["*"] en prod.
+import os
+_allowed_origins_env = os.environ.get("ALBEDONET_ALLOWED_ORIGINS", "")
+ALLOWED_ORIGINS = (
+    [o.strip() for o in _allowed_origins_env.split(",") if o.strip()]
+    if _allowed_origins_env
+    else ["http://localhost:8000", "http://127.0.0.1:8000"]
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
@@ -97,6 +117,7 @@ def api_single(address: str):
                 with_candidates=False,
             )
         except Exception as exc:
+            logger.exception("Echec de la recuperation IGN (WFS/WMS) pour address=%r", address)
             return {
                 "found": True, "address_label": geocode_result.address_label,
                 "lat": geocode_result.lat, "lon": geocode_result.lon,
@@ -139,6 +160,10 @@ def api_single(address: str):
         try:
             albedo = predict_albedo(patch, checkpoint_path)
         except Exception as exc:
+            logger.exception(
+                "Echec de l'inference (checkpoint=%s, model_label=%s, address=%r)",
+                checkpoint_path, model_label, address,
+            )
             base["albedo"] = None
             base["error"] = f"Echec de l'inference : {exc}"
             return base
@@ -160,6 +185,10 @@ def api_single(address: str):
             base["albedo_brut"] = calib.albedo_brut
             base["shadow_fraction"] = calib.shadow_fraction
         except Exception:
+            logger.exception(
+                "Echec de la calibration d'ombre (material=%s, address=%r) -- fallback sur l'albedo brut",
+                material, address,
+            )
             base["albedo"] = albedo
             base["albedo_brut"] = albedo
             base["shadow_fraction"] = None
