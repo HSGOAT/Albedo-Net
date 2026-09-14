@@ -197,10 +197,17 @@ ville.
 
 1. ~~Trancher le frontend unique~~ — fait le 14/09/2026 : FastAPI +
    `static/index.html` retenu, `app.py` (Streamlit) archivé dans
-   `legacy/` (§2). Point de vigilance résiduel : les commentaires
-   "utilisé depuis app.py" dans les modules partagés ne sont pas tous
-   réécrits — à corriger au fil de l'eau si on touche ces zones, pas
-   urgent.
+   `legacy/` (§2). Les commentaires/docstrings des modules partagés
+   (`geocoding.py`, `ign_fetch.py`, `zone_scan.py`, `pipeline.py`,
+   `inference.py`, `config.py`, `versioning.py`,
+   `patch_extraction.py`) ont été nettoyés dans la foulée : les
+   mentions d'`app.py` pointent maintenant vers `main.py` quand c'est
+   un vrai appelant backend, ou vers "le frontend" quand le commentaire
+   décrit en réalité un comportement d'affichage (menu déroulant,
+   vignettes) qui vit dans `static/index.html`. Vocabulaire Streamlit
+   devenu trompeur (`selectbox`, "interaction Streamlit") retiré au
+   passage. `data_collection/annotation_tool.py` n'est pas concerné —
+   outil interne distinct, toujours en Streamlit (§2).
 2. ~~Retrouver/committer le backend FastAPI manquant~~ — fait, `main.py`
    est dans le dépôt et sert bien `/api/zone/stream` + `static/`.
 3. ~~Audit d'étanchéité des splits en CI~~ — fait (§3).
