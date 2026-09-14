@@ -1,0 +1,91 @@
+diff a/METHODOLOGIE.md b/METHODOLOGIE.md	(rejected hunks)
+@@ -1,6 +1,6 @@
+ # METHODOLOGIE.md — AlbedoNet
+ 
+-> Dernière mise à jour : 14/09/2026. Ce document décrit l'état **réel** du
++> Dernière mise à jour : 14/09/2026 (frontend tranché). Ce document décrit l'état **réel** du
+ > dépôt, pas l'état visé. Quand quelque chose est en cours ou non résolu,
+ > c'est dit explicitement — l'objectif est d'éviter qu'une future session
+ > (agent ou humain) reparte d'hypothèses fausses sur l'architecture.
+@@ -36,31 +36,41 @@ Pipeline bout-en-bout (`pipeline.py`, `zone_scan.py`) :
+    des toits clairs et inversement) via `DARK_ROOF_ALBEDO_THRESHOLD` /
+    `MIN_DARK_NEIGHBORS` / `MIN_BRIGHT_NEIGHBORS`.
+ 
+-## 2. État du frontend — **non tranché, à faire**
+-
+-Il existe **deux interfaces qui coexistent dans le dépôt**, pas une seule :
+-
+-- `app.py` — application **Streamlit** complète (geocodage → carte
+-  `pydeck` → image du toit → albédo), qui réimporte directement les
+-  mêmes modules Python (`inference`, `materials`, `pipeline`, `zone_scan`,
+-  etc.). Autonome, pas de dépendance à `main.py`.
+-- `main.py` (**FastAPI**) + `static/index.html` — API REST
+-  (`/api/single`, `/api/batch`, `/api/batch.csv`, `/api/zone`,
+-  `/api/zone.csv`, `/api/zone/stream`) qui sert aussi `static/` en
+-  fichiers statiques (`StaticFiles(..., html=True)`, montée en `/`).
+-  `index.html` est un frontend JS autonome qui consomme cette API.
+-
+-**Ce n'est plus un mockup mort** : `main.py` existe bel et bien dans le
+-dépôt versionné et expose réellement `/api/zone/stream` — le point
+-d'incertitude "le backend a peut-être disparu" évoqué précédemment est
+-résolu, le fichier est là. Ce qui reste **non résolu**, c'est le choix
+-produit : les deux frontends sont maintenus en parallèle, ce qui veut dire
+-que toute feature ajoutée à l'un (ex. affichage du score de confiance,
+-filtre par matériau) doit être dupliquée dans l'autre pour ne pas diverger.
+-Aucun `/legacy` ni tag git n'a encore été créé pour trancher. **Tant que ce
+-choix n'est pas fait, considérer les deux comme actifs et à mettre à jour
+-en parallèle** — ne pas supposer que l'un est mort sans vérifier ce
+-fichier à jour.
++## 2. Frontend — **tranché le 14/09/2026 : FastAPI + HTML est le produit**
++
++`main.py` (**FastAPI**) + `static/index.html` est désormais l'unique
++frontend maintenu :
++
++- API REST : `/api/single`, `/api/batch`, `/api/batch.csv`, `/api/zone`,
++  `/api/zone.csv`, `/api/zone/stream` (Server-Sent Events pour le retour
++  progressif d'un scan de zone).
++- `static/index.html` — frontend JS autonome qui consomme cette API,
++  servi par FastAPI lui-même (`StaticFiles(..., html=True)`, monté en
++  `/`).
++
++L'ancienne app **Streamlit** (`app.py` — geocodage → carte `pydeck` →
++image du toit → albédo, réimportant directement les mêmes modules Python
++que le backend : `inference`, `materials`, `pipeline`, `zone_scan`, etc.)
++est **archivée dans `legacy/app.py`**, pas supprimée (cf.
++`legacy/README.md` pour le détail du choix et comment la relancer si
++besoin ponctuel). Elle n'est plus maintenue : toute nouvelle feature UI
++(score de confiance, filtre par matériau, etc.) ne doit être écrite que
++côté `static/index.html` + `main.py`.
++
++**Ne pas confondre avec `data_collection/annotation_tool.py`** : cet
++outil utilise aussi Streamlit, mais c'est un outil interne d'annotation
++manuelle de données (labellisation matériaux pour construire le dataset
++d'entraînement), pas un frontend produit. Il n'est pas concerné par cet
++archivage et continue de vivre à la racine de `data_collection/`.
++
++Les nombreux commentaires dans les modules partagés
++(`geocoding.py`, `ign_fetch.py`, `zone_scan.py`, `pipeline.py`,
++`patch_extraction.py`, `inference.py`, ...) qui décrivent encore un point
++d'entrée comme "utilisé depuis `app.py`" désignent l'**usage historique**
++documenté au moment de l'écriture ; ces modules sont désormais consommés
++par `main.py`, pas par `app.py`. Le comportement du code n'a pas changé
++par ce déplacement (aucun import cassé — `main.py` n'a jamais dépendu de
++`app.py`), seuls les commentaires n'ont pas été réécrits systématiquement.
+ 
+ ## 3. Étanchéité des splits train/val/test — audité en CI
+ 
+@@ -185,8 +195,12 @@ ville.
+ 
+ ## 8. Ce qui reste ouvert (par ordre de coût/bénéfice décroissant, cf. discussion produit du 14/09/2026)
+ 
+-1. **Trancher le frontend unique** (§2) — le point qui coûte le plus cher
+-   tant qu'il traîne : chaque feature UI doit être écrite deux fois.
++1. ~~Trancher le frontend unique~~ — fait le 14/09/2026 : FastAPI +
++   `static/index.html` retenu, `app.py` (Streamlit) archivé dans
++   `legacy/` (§2). Point de vigilance résiduel : les commentaires
++   "utilisé depuis app.py" dans les modules partagés ne sont pas tous
++   réécrits — à corriger au fil de l'eau si on touche ces zones, pas
++   urgent.
+ 2. ~~Retrouver/committer le backend FastAPI manquant~~ — fait, `main.py`
+    est dans le dépôt et sert bien `/api/zone/stream` + `static/`.
+ 3. ~~Audit d'étanchéité des splits en CI~~ — fait (§3).
