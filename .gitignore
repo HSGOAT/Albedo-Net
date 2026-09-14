@@ -1,0 +1,26 @@
+﻿# Environnement Python
+.venv/
+__pycache__/
+*.pyc
+
+# Checkpoints modeles (volumineux, ~260 Mo/ville -- a gerer via stockage
+# externe plus tard, pas dans git pour l'instant)
+checkpoints/
+
+# Cache OSM / donnees temporaires
+.osm_cache_v2/
+
+# Dataset genere (regenerable via build_training_dataset.py) -- a discuter
+# si on veut le versionner ou pas (peut etre volumineux aussi)
+# datasets/materials_v1.parquet
+
+# Sorties de validation / rapports
+validation_out/
+
+# Fichiers de test / cache pytest
+.pytest_cache/
+tests/__pycache__/
+
+# Fichiers Windows/IDE
+.vscode/
+*.log

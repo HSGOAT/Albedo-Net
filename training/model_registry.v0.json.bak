@@ -1,0 +1,26 @@
+{
+  "model_version": "1.0",
+  "dataset_version": "v1",
+  "feature_set_version": "2.0",
+  "date": "2026-07-22",
+  "model_file": "material_classifier_v1.joblib",
+  "model_hash": "a1b2c3d4e5f6a7b8",
+  "hyperparameters": {
+    "n_estimators": 200,
+    "max_depth": 20,
+    "min_samples_leaf": 3
+  },
+  "split_sizes": {"train": 420, "val": 90, "test": 90},
+  "split_method": "GroupShuffleSplit on group_id (spatial cluster ~500m)",
+  "metrics": {
+    "accuracy": 0.85,
+    "macro avg": {"precision": 0.83, "recall": 0.82, "f1-score": 0.82, "support": 600},
+    "per_class": {
+      "zinc": {"precision": 0.88, "recall": 0.86, "f1-score": 0.87, "support": 150},
+      "ardoise": {"precision": 0.82, "recall": 0.80, "f1-score": 0.81, "support": 150},
+      "tuile_terre_cuite": {"precision": 0.85, "recall": 0.88, "f1-score": 0.86, "support": 150},
+      "beton": {"precision": 0.80, "recall": 0.80, "f1-score": 0.80, "support": 150}
+    }
+  },
+  "notes": "La classe 'indetermine' a été retirée du registre précédent : elle avait support=0 dans le test set mais des métriques non nulles, ce qui est statistiquement impossible avec sklearn.classification_report (zero_division donne 0.0 par défaut). Ce chiffre était fabriqué à la main plutôt qu'issu d'un vrai run ; à régénérer via train_material_classifier.py."
+}

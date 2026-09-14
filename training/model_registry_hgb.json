@@ -1,0 +1,55 @@
+{
+  "model_version": "1.1-hgb",
+  "dataset_version": "v1",
+  "feature_set_version": "3.0",
+  "date": "2026-07-23",
+  "model_file": "material_classifier_v1_hgb.joblib",
+  "model_hash": "e1703f1848778db8",
+  "hyperparameters": {
+    "learning_rate": 0.05,
+    "max_depth": 20,
+    "max_iter": 100,
+    "min_samples_leaf": 10
+  },
+  "split_sizes": {
+    "train": 1671,
+    "val": 415,
+    "test": 396
+  },
+  "split_method": "GroupShuffleSplit on group_id (spatial cluster ~500m)",
+  "metrics": {
+    "accuracy": 0.5606060606060606,
+    "macro avg": {
+      "precision": 0.5601180162855492,
+      "recall": 0.5704665053428112,
+      "f1-score": 0.5559936680679716,
+      "support": 396.0
+    },
+    "per_class": {
+      "ardoise": {
+        "precision": 0.5714285714285714,
+        "recall": 0.4528301886792453,
+        "f1-score": 0.5052631578947369,
+        "support": 106.0
+      },
+      "beton": {
+        "precision": 0.4878048780487805,
+        "recall": 0.37383177570093457,
+        "f1-score": 0.42328042328042326,
+        "support": 107.0
+      },
+      "tuile_terre_cuite": {
+        "precision": 0.7222222222222222,
+        "recall": 0.7722772277227723,
+        "f1-score": 0.7464114832535885,
+        "support": 101.0
+      },
+      "zinc": {
+        "precision": 0.45901639344262296,
+        "recall": 0.6829268292682927,
+        "f1-score": 0.5490196078431373,
+        "support": 82.0
+      }
+    }
+  }
+}

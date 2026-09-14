@@ -1,0 +1,46 @@
+name: Audit qualite dataset & coherence des seuils
+
+on:
+  push:
+    paths:
+      - "datasets/materials_v1.parquet"
+      - "build_training_dataset.py"
+      - "train_material_classifier.py"
+      - "config.py"
+      - "heat_island_calibration.py"
+      - "confidence.py"
+      - "materials.py"
+      - "shadow_calibration.py"
+      - "city_registry.py"
+      - "tests/**"
+  pull_request:
+    paths:
+      - "datasets/materials_v1.parquet"
+      - "build_training_dataset.py"
+      - "train_material_classifier.py"
+      - "config.py"
+      - "heat_island_calibration.py"
+      - "confidence.py"
+      - "materials.py"
+      - "shadow_calibration.py"
+      - "city_registry.py"
+      - "tests/**"
+  workflow_dispatch: {}
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installer les dependances
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas scikit-learn scikit-image pyarrow pytest joblib numpy opencv-python-headless
+
+      - name: Lancer tous les audits (etancheite splits + coherence seuils/cles)
+        run: pytest tests/ -v
