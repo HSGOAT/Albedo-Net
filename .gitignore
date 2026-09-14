@@ -24,3 +24,7 @@ tests/__pycache__/
 # Fichiers Windows/IDE
 .vscode/
 *.log
+
+# Fichiers de patch / rejects locaux -- jamais versionnes
+*.patch
+*.rej
