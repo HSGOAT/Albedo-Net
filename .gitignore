@@ -1,11 +1,11 @@
-﻿# Environnement Python
+# Environnement Python
 .venv/
 __pycache__/
 *.pyc
 
 # Checkpoints modeles (volumineux, ~260 Mo/ville -- a gerer via stockage
 # externe plus tard, pas dans git pour l'instant)
-checkpoints/
+checkpoints/*
 
 # Cache OSM / donnees temporaires
 .osm_cache_v2/
